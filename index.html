@@ -1,493 +1,1258 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vinted Sniper PRO</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg: #f2f2f7; 
-            --surface: #ffffff; 
-            --primary: #007aff;
-            --text: #000000; 
-            --secondary: #8e8e93; 
-            --border: rgba(60, 60, 67, 0.1);
-            --danger: #ff3b30; 
-            --gold: #ffd700; 
-            --green: #34c759;
-            --glass-bg: rgba(255, 255, 255, 0.85); 
-            --input-bg: rgba(118, 118, 128, 0.08);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Mercari Sniper</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+/* ════════════════════════════════════════════════
+   CSS — Dark luxury / streetwear aesthetic
+   ════════════════════════════════════════════════ */
+:root {
+  --bg:       var(--tg-theme-bg-color, #0a0a0a);
+  --bg2:      var(--tg-theme-secondary-bg-color, #141414);
+  --text:     var(--tg-theme-text-color, #f0f0f0);
+  --hint:     var(--tg-theme-hint-color, #666);
+  --accent:   var(--tg-theme-button-color, #c8a97e);
+  --accent2:  #a0825a;
+  --btn-text: var(--tg-theme-button-text-color, #000);
+  --card:     #1a1a1a;
+  --border:   rgba(255,255,255,0.06);
+  --danger:   #e74c3c;
+  --green:    #27ae60;
+  --gold:     #c8a97e;
+  --radius:   14px;
+  --shadow:   0 4px 24px rgba(0,0,0,0.4);
+}
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #000000; 
-                --surface: #1c1c1e; 
-                --text: #ffffff;
-                --border: rgba(84, 84, 88, 0.3); 
-                --primary: #0a84ff;
-                --glass-bg: rgba(28, 28, 30, 0.85); 
-                --input-bg: rgba(118, 118, 128, 0.24);
-            }
-        }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            margin: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            padding-bottom: 110px;
-        }
-        
-        /* Верхнее меню */
-        .tab-bar { 
-            display: flex; background: var(--glass-bg); backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px); padding: 10px 16px; position: sticky; 
-            top: 0; z-index: 100; border-bottom: 1px solid var(--border); gap: 10px; 
-        }
-        .tab { 
-            flex: 1; text-align: center; padding: 10px 0; font-size: 15px; font-weight: 600; 
-            color: var(--secondary); cursor: pointer; border-radius: 12px; transition: all 0.3s ease; 
-        }
-        .tab.active { background: var(--surface); color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        
-        .content { display: none; padding: 16px; animation: fadeIn 0.4s ease; }
-        .content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Карточки и инпуты */
-        .card { 
-            background: var(--surface); border-radius: 20px; padding: 20px; 
-            margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid var(--border); 
-        }
-        .section-title { font-size: 13px; font-weight: 700; color: var(--secondary); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .input-group { margin-bottom: 14px; display: flex; gap: 12px; }
-        .input-group:last-child { margin-bottom: 0; }
-        .input-wrapper { position: relative; flex: 1; }
-        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--secondary); z-index: 1; }
-        input { 
-            width: 100%; background: var(--input-bg); border: 2px solid transparent; 
-            color: var(--text); padding: 16px 16px 16px 46px; border-radius: 16px; 
-            font-size: 16px; font-weight: 500; outline: none; transition: all 0.2s ease; 
-        }
-        input::placeholder { color: var(--secondary); font-weight: 400; }
-        input:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 4px 16px rgba(10, 132, 255, 0.15); }
+body {
+  font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding-bottom: 90px;
+  overflow-x: hidden;
+}
 
-        /* Переключатели и чипы */
-        .segment-control { display: flex; flex-wrap: wrap; gap: 6px; background: var(--input-bg); border-radius: 14px; padding: 6px; }
-        .segment-btn { 
-            flex: 1; min-width: 30%; text-align: center; padding: 12px; font-size: 14px; 
-            font-weight: 600; color: var(--secondary); border-radius: 10px; cursor: pointer; 
-            transition: all 0.3s ease; position: relative; 
-        }
-        .segment-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: scale(1.02); }
-        
-        .chips-container { display: flex; flex-wrap: wrap; gap: 10px; }
-        .chip { 
-            padding: 12px 18px; background: var(--input-bg); border: 2px solid transparent; 
-            border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; 
-            transition: all 0.2s ease; color: var(--secondary); 
-        }
-        .chip.selected { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3); transform: translateY(-2px); }
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 2px; }
 
-        /* Нижняя кнопка */
-        .bottom-bar { 
-            position: fixed; bottom: 0; left: 0; right: 0; padding: 16px 20px 32px; 
-            background: linear-gradient(to top, var(--bg) 70%, transparent); z-index: 100; pointer-events: none; 
-        }
-        button.btn { 
-            width: 100%; background: linear-gradient(135deg, #007aff, #005bb5); color: #fff; 
-            border: none; padding: 18px; border-radius: 16px; font-size: 17px; font-weight: 700; 
-            cursor: pointer; transition: all 0.2s ease; box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3); pointer-events: auto; 
-        }
-        button.btn:active { transform: scale(0.96); opacity: 0.9; }
-        button.btn.disabled { background: var(--input-bg); color: var(--secondary); box-shadow: none; cursor: not-allowed; }
+/* ── Header ── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px;
+}
 
-        /* Профиль и список засад */
-        .profile-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, #a18cd1, #fbc2eb); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 8px 20px rgba(161, 140, 209, 0.4); }
-        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; }
-        .status-free { background: rgba(255, 59, 48, 0.1); color: var(--danger); }
-        .status-premium { background: linear-gradient(135deg, #ffd700, #ff9500); color: #000; box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3); }
-        
-        .search-item { background: var(--surface); padding: 18px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
-        .action-buttons { display: flex; gap: 8px; }
-        .action-buttons button { border: none; padding: 10px; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .action-buttons button:active { transform: scale(0.9); }
-        .edit-btn { background: rgba(10, 132, 255, 0.1); color: var(--primary); }
-        .delete-btn { background: rgba(255, 59, 48, 0.1); color: var(--danger); }
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 480px;
+  margin: 0 auto;
+}
 
-        /* Премиум Тарифы */
-        .premium-card { background: linear-gradient(145deg, #1c1c1e, #000000); border: 1px solid #38383a; color: white; border-radius: 24px; padding: 30px 20px; text-align: center; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .premium-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 60%); z-index: 0; pointer-events: none; }
-        .premium-content { position: relative; z-index: 1; }
-        .badge-hit { position: absolute; top: -10px; right: -10px; background: linear-gradient(135deg, #ff3b30, #ff9500); color: white; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 8px; border: 2px solid var(--surface); box-shadow: 0 4px 8px rgba(255,59,48,0.4); z-index: 2;}
-        .plan-price { font-size: 18px; color: var(--gold); font-weight: 800; margin-top: 4px; display: block; }
-        
-        .btn-col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 4px; }
-        .emoji-top { font-size: 22px; line-height: 1; }
-        
-        .plans-grid { display: flex; flex-wrap: wrap; gap: 18px 8px; background: rgba(255,255,255,0.05); border-radius: 14px; padding: 16px 8px 8px 8px; justify-content: center; }
-        .plans-grid .segment-btn { margin: 0 !important; position: relative; }
-        .plan-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; z-index: 2; }
-        .plan-month { background: rgba(255, 215, 0, 0.08) !important; border: 1px solid rgba(255, 215, 0, 0.4); }
-        .segment-btn.active.plan-month { background: var(--surface) !important; border-color: #ffd700; }
-    </style>
+.logo {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--gold), #e8d5b5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--hint);
+  background: var(--bg2);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.user-badge.premium {
+  background: linear-gradient(135deg, #c8a97e22, #c8a97e11);
+  border: 1px solid #c8a97e33;
+  color: var(--gold);
+}
+
+/* ── Container ── */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ── Page sections ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  padding: 32px 0 24px;
+}
+
+.hero-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff, var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+  color: var(--hint);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* ── Brand Grid ── */
+.section-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--hint);
+  margin: 24px 0 12px;
+  padding-left: 4px;
+}
+
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.brand-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.brand-card:active {
+  transform: scale(0.95);
+}
+
+.brand-card:active::before,
+.brand-card.selected::before {
+  opacity: 1;
+}
+
+.brand-card.selected {
+  border-color: var(--gold);
+  background: #1f1a14;
+}
+
+.brand-emoji {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.brand-name {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+/* ── Stats ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 12px;
+  text-align: center;
+}
+
+.stat-val {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--gold);
+  display: block;
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--hint);
+  margin-top: 4px;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--accent2));
+  color: #000;
+}
+
+.btn-dark {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: 10px 16px;
+  font-size: 12px;
+  display: inline-block;
+  width: auto;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── Filter Card ── */
+.filter-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+.filter-card.inactive {
+  opacity: 0.5;
+}
+
+.filter-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filter-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+  flex-shrink: 0;
+}
+
+.filter-dot.on { background: var(--green); }
+
+.filter-name {
+  font-size: 16px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.filter-brand-emoji {
+  font-size: 20px;
+}
+
+.filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  background: rgba(200,169,126,0.1);
+  border: 1px solid rgba(200,169,126,0.15);
+  color: var(--gold);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Form ── */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--hint);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--gold);
+}
+
+.form-input::placeholder {
+  color: var(--hint);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-select {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+/* ── Subscription ── */
+.plan-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.plan-card:active { transform: scale(0.97); }
+
+.plan-card.selected {
+  border-color: var(--gold);
+  background: #1f1a14;
+}
+
+.plan-card.best {
+  border-color: var(--gold);
+}
+
+.plan-card.best::before {
+  content: 'ЛУЧШАЯ ЦЕНА';
+  position: absolute;
+  top: 8px;
+  right: -28px;
+  background: var(--gold);
+  color: #000;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 32px;
+  transform: rotate(45deg);
+}
+
+.plan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plan-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.plan-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.plan-badge {
+  display: inline-block;
+  background: rgba(200,169,126,0.15);
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.plan-perks {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--hint);
+}
+
+/* ── Premium Banner ── */
+.premium-banner {
+  background: linear-gradient(135deg, #1a1510, #2a2015);
+  border: 1px solid rgba(200,169,126,0.2);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.premium-banner h3 {
+  color: var(--gold);
+  font-size: 16px;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+
+.premium-banner p {
+  color: var(--hint);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* ── Item Cards (search results) ── */
+.items-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.item-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.item-card:active { transform: scale(0.95); }
+
+.item-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.item-img-placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--hint);
+}
+
+.item-info {
+  padding: 10px;
+}
+
+.item-name {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.item-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.item-meta {
+  font-size: 10px;
+  color: var(--hint);
+  margin-top: 2px;
+}
+
+/* ── Search ── */
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+}
+
+.search-bar input:focus { border-color: var(--gold); }
+
+.search-bar button {
+  padding: 14px 20px;
+  background: var(--gold);
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ── Empty State ── */
+.empty {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--hint);
+}
+
+.empty-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+.empty p { margin-top: 4px; font-size: 14px; }
+
+/* ── How it works ── */
+.steps {
+  margin: 16px 0;
+}
+
+.step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--accent2));
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.step-text {
+  font-size: 14px;
+  line-height: 1.5;
+  padding-top: 5px;
+}
+
+/* ── Bottom Nav ── */
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--hint);
+  cursor: pointer;
+  padding: 6px 16px;
+  transition: color 0.2s;
+  font-family: inherit;
+}
+
+.nav-item.active { color: var(--gold); }
+.nav-icon { font-size: 22px; }
+.nav-label { font-size: 10px; letter-spacing: 0.5px; }
+
+/* ── Loading ── */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 12px;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.toast.show { opacity: 1; }
+</style>
 </head>
 <body>
 
-    <!-- НАВИГАЦИЯ -->
-    <div class="tab-bar">
-        <div class="tab active" onclick="switchTab('search')">🔍 Поиск</div>
-        <div class="tab" onclick="switchTab('profile')">👤 Профиль</div>
-        <div class="tab" onclick="switchTab('premium')">👑 Premium</div>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-inner">
+    <span class="logo">SNIPER</span>
+    <div class="user-badge" id="userBadge">
+      <span id="userPlan">🆓 FREE</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ═══════════ PAGE: HOME ═══════════ -->
+<div class="page active" id="page-home">
+
+  <div class="hero fade-in">
+    <div class="hero-title">MERCARI<br>SNIPER</div>
+    <div class="hero-sub">Лови грейлы раньше всех</div>
+  </div>
+
+  <!-- Quick Brand Picks -->
+  <div class="section-title">🔥 Быстрый старт — выбери бренд</div>
+  <div class="brand-grid fade-in" id="brandGrid">
+    <!-- заполняется JS -->
+  </div>
+
+  <div class="btn-group" style="margin-top:20px">
+    <button class="btn btn-gold" onclick="showPage('filters')">
+      🎯 МОИ ФИЛЬТРЫ
+    </button>
+    <button class="btn btn-dark" onclick="showPage('search')">
+      🔍 ПОИСК НА MERCARI
+    </button>
+  </div>
+
+  <!-- How it works -->
+  <div class="card" style="margin-top:16px">
+    <div class="section-title" style="margin-top:0">Как это работает</div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <span class="step-text">Выбери бренд или создай свой фильтр с ключевыми словами</span>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span class="step-text">Бот мониторит Mercari Japan 24/7 каждые несколько секунд</span>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span class="step-text">Новый товар — мгновенное push-уведомление в Telegram</span>
+      </div>
+      <div class="step">
+        <span class="step-num">4</span>
+        <span class="step-text">Переходи и покупай первым. Будь быстрее всех 🏎️</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Premium CTA -->
+  <div class="premium-banner" id="premiumBanner">
+    <h3>⭐ PREMIUM ACCESS</h3>
+    <p>50 фильтров • Проверка каждые 8 сек • Все бренды</p>
+    <button class="btn btn-gold btn-sm" onclick="showPage('sub')">ОБНОВИТЬ</button>
+  </div>
+
+</div>
+
+<!-- ═══════════ PAGE: FILTERS ═══════════ -->
+<div class="page" id="page-filters">
+
+  <div class="section-title" style="margin-top:16px">
+    🎯 Мои фильтры <span id="filterCount" style="color:var(--gold)"></span>
+  </div>
+
+  <div id="filtersList"></div>
+
+  <button class="btn btn-gold" style="margin-top:12px" onclick="showNewFilter()">
+    ➕ НОВЫЙ ФИЛЬТР
+  </button>
+
+  <!-- New Filter Form (hidden) -->
+  <div id="newFilterForm" style="display:none;margin-top:16px" class="card fade-in">
+    <div class="card-title" style="margin-bottom:16px">📝 Новый фильтр</div>
+
+    <div class="form-group">
+      <label class="form-label">Название</label>
+      <input class="form-input" id="nfName" placeholder="Stone Island Jacket">
     </div>
 
-    <!-- ВКЛАДКА: ПОИСК (СОЗДАНИЕ ЗАСАДЫ) -->
-    <div id="search" class="content active">
-        <div class="card">
-            <div class="section-title">География парсинга (можно выбрать несколько)</div>
-            <div class="segment-control" id="domain-selector">
-                <!-- ЗДЕСЬ ИСПРАВЛЕНЫ КНОПКИ ДЛЯ МУЛЬТИ-ВЫБОРА СТРАН -->
-                <div class="segment-btn active" data-val="vinted.fr" onclick="toggleDomain(this)">🇫🇷 FR</div>
-                <div class="segment-btn" data-val="vinted.it" onclick="toggleDomain(this)">🇮🇹 IT</div>
-                <div class="segment-btn" data-val="vinted.pl" onclick="toggleDomain(this)">🇵🇱 PL</div>
-                <div class="segment-btn" data-val="vinted.es" onclick="toggleDomain(this)">🇪🇸 ES</div>
-                <div class="segment-btn" data-val="vinted.de" onclick="toggleDomain(this)">🇩🇪 DE</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="section-title">Что ищем?</div>
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <span class="input-icon">🏷️</span>
-                    <input type="text" id="brand" placeholder="Бренд (Nike, Carhartt...)">
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <span class="input-icon">💶</span>
-                    <input type="number" id="min_price" placeholder="Мин. цена">
-                </div>
-                <div class="input-wrapper">
-                    <span class="input-icon">💶</span>
-                    <input type="number" id="max_price" placeholder="Макс. цена">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <div class="input-wrapper">
-                    <span class="input-icon">📏</span>
-                    <input type="text" id="size" placeholder="Размер (S, M, 42...)">
-                </div>
-            </div>
-            
-            <!-- МИНУС СЛОВА -->
-            <div class="input-group" style="margin-top: 14px;">
-                <div class="input-wrapper">
-                    <span class="input-icon">🚫</span>
-                    <input type="text" id="minus_words" placeholder="Исключить слова (через запятую)">
-                </div>
-            </div>
-        </div>
-
-        <div class="card" style="margin-bottom: 100px;">
-            <!-- ЖЕЛЕЗОБЕТОННЫЕ КАТЕГОРИИ -->
-            <div class="section-title">Категория</div>
-            <div class="segment-control" id="category-selector" style="margin-bottom: 24px; align-items: stretch;">
-                <div class="segment-btn active btn-col" data-val="all" onclick="selectSegment('category', this)">Все</div>
-                <div class="segment-btn btn-col" data-val="clothes" onclick="selectSegment('category', this)">
-                    <span class="emoji-top">👕</span>
-                    <span>Одежда</span>
-                </div>
-                <div class="segment-btn btn-col" data-val="shoes" onclick="selectSegment('category', this)">
-                    <span class="emoji-top">👟</span>
-                    <span>Обувь</span>
-                </div>
-            </div>
-
-            <div class="section-title">Состояние</div>
-            <div class="chips-container" id="conditions-container">
-                <div class="chip" data-val="6" onclick="toggleChip(this)">Новое с биркой</div>
-                <div class="chip" data-val="1" onclick="toggleChip(this)">Новое без бирки</div>
-                <div class="chip" data-val="2" onclick="toggleChip(this)">Отличное</div>
-                <div class="chip" data-val="3" onclick="toggleChip(this)">Хорошее</div>
-                <div class="chip" data-val="4" onclick="toggleChip(this)">Нормальное</div>
-            </div>
-        </div>
-
-        <div class="bottom-bar">
-            <button id="submit-btn" class="btn" onclick="sendSearch()">🚀 Начать охоту</button>
-        </div>
+    <div class="form-group">
+      <label class="form-label">Ключевое слово</label>
+      <input class="form-input" id="nfKeyword" placeholder="ストーンアイランド ジャケット">
     </div>
 
-    <!-- ВКЛАДКА: ПРОФИЛЬ -->
-    <div id="profile" class="content">
-        <div class="card" style="text-align: center; padding: 32px 20px;">
-            <div class="profile-avatar">👨‍💻</div>
-            <h2 id="user-name" style="margin: 0 0 6px 0; font-size: 24px; font-weight: 800;">Загрузка...</h2>
-            <p style="color: var(--secondary); font-size: 14px; margin: 0 0 20px 0; font-family: monospace;">ID: <span id="user-id">...</span></p>
-            <div id="status-container"></div>
-        </div>
-        <div class="section-title" style="margin-left: 8px;">Мои активные засады</div>
-        <div id="searches-container"></div>
+    <div class="form-group">
+      <label class="form-label">Исключить слова</label>
+      <input class="form-input" id="nfExclude" placeholder="ジャンク 破損">
     </div>
 
-    <!-- ВКЛАДКА: PREMIUM -->
-    <div id="premium" class="content">
-        <div class="premium-card">
-            <div class="premium-content">
-                <div style="font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));">👑</div>
-                <h2 style="margin: 0 0 24px 0; color: #ffd700; font-size: 26px; font-weight: 800;">Vinted Sniper PRO</h2>
-                
-                <div class="section-title" style="color: #8e8e93; text-align: left; margin-bottom: 16px;">1. Выберите тариф:</div>
-                
-                <div class="plans-grid" id="plan-selector" style="margin-bottom: 24px;">
-                    <div class="segment-btn active" data-val="week" onclick="selectPlan(this)" style="flex: 1 1 28%;">Неделя <span class="plan-price">3$</span></div>
-                    <div class="segment-btn plan-month" data-val="month" onclick="selectPlan(this)" style="flex: 1 1 28%;">
-                        <div class="plan-badge" style="background: linear-gradient(135deg, #ff3b30, #ff9500); color: white; box-shadow: 0 4px 8px rgba(255,59,48,0.4);">🔥 ХИТ</div>
-                        Месяц <span class="plan-price">10$</span>
-                    </div>
-                    <div class="segment-btn" data-val="3months" onclick="selectPlan(this)" style="flex: 1 1 28%;">3 Месяца <span class="plan-price">25$</span></div>
-                    <div class="segment-btn" data-val="year" onclick="selectPlan(this)" style="flex: 1 1 45%;">
-                        <div class="plan-badge" style="background: linear-gradient(135deg, #af52de, #5e5ce6); color: white; box-shadow: 0 4px 8px rgba(175, 82, 222, 0.4);">🚀 МЕГА ХИТ</div>
-                        1 Год <span class="plan-price">100$</span>
-                    </div>
-                    <div class="segment-btn" data-val="forever" onclick="selectPlan(this)" style="flex: 1 1 45%;">Навсегда <span class="plan-price">150$</span></div>
-                </div>
-
-                <div class="section-title" style="color: #8e8e93; text-align: left; margin-bottom: 16px;">2. Метод оплаты:</div>
-
-                <button class="btn" style="background: linear-gradient(135deg, #0a84ff, #005bb5); margin-bottom: 12px; position: relative; z-index: 10;" onclick="buyMethod('buy_stars')">⭐️ Оплатить Звездами</button>
-                <button class="btn" style="background: linear-gradient(135deg, #2b5876, #4e4376); margin-bottom: 12px; box-shadow: 0 8px 24px rgba(78, 67, 118, 0.4); position: relative; z-index: 10;" onclick="buyMethod('buy_crypto')">🪙 Оплатить Криптой (USDT)</button>
-                <button class="btn" style="background: rgba(255,255,255,0.1); color: #fff; font-size: 15px; box-shadow: none; position: relative; z-index: 10;" onclick="contactAdmin()">💳 Перевод на карту (Админ)</button>
-            </div>
-        </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Мин. цена ¥</label>
+        <input class="form-input" id="nfPMin" type="number" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Макс. цена ¥</label>
+        <input class="form-input" id="nfPMax" type="number" placeholder="∞">
+      </div>
     </div>
 
-    <!-- СКРИПТЫ И ЛОГИКА -->
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        try { tg.setHeaderColor('secondary_bg_color'); } catch(e) {}
+    <div class="form-group">
+      <label class="form-label">Категория</label>
+      <select class="form-select" id="nfCat">
+        <option value="">Все категории</option>
+        <option value="2">👔 Мужская одежда</option>
+        <option value="1">👗 Женская одежда</option>
+        <option value="8">📱 Электроника</option>
+        <option value="9">👟 Спорт</option>
+        <option value="6">🎮 Хобби</option>
+      </select>
+    </div>
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('id') || tg.initDataUnsafe?.user?.id || '—';
-        const premiumDays = parseInt(urlParams.get('days') || '0');
-        const userName = tg.initDataUnsafe?.user?.first_name || 'Пользователь';
-        
-        let userSearches = [];
-        let currentEditId = null; 
-        
-        try { 
-            if (urlParams.get('searches')) {
-                userSearches = JSON.parse(decodeURIComponent(urlParams.get('searches'))); 
-            }
-        } catch(e) { console.error("Ошибка загрузки поисков", e); }
+    <div class="btn-group">
+      <button class="btn btn-gold" onclick="createFilter()">✅ СОЗДАТЬ</button>
+      <button class="btn btn-dark" onclick="hideNewFilter()">ОТМЕНА</button>
+    </div>
+  </div>
 
-        document.getElementById('user-name').innerText = userName;
-        document.getElementById('user-id').innerText = userId;
-        document.getElementById('status-container').innerHTML = premiumDays > 0 
-            ? `<div class="status-badge status-premium">★ PREMIUM (${premiumDays} ДН.)</div>`
-            : `<div class="status-badge status-free">🔴 БЕЗ ПОДПИСКИ</div>`;
+</div>
 
-        const submitBtn = document.getElementById('submit-btn');
-        if (premiumDays <= 0) {
-            submitBtn.classList.add('disabled');
-            submitBtn.innerText = "🔒 Требуется Premium";
-        }
+<!-- ═══════════ PAGE: SEARCH ═══════════ -->
+<div class="page" id="page-search">
 
-        // Отрисовка списка поисков
-        const flags = { 'vinted.fr': '🇫🇷', 'vinted.it': '🇮🇹', 'vinted.pl': '🇵🇱', 'vinted.es': '🇪🇸', 'vinted.de': '🇩🇪' };
-        const sCont = document.getElementById('searches-container');
-        
-        if (userSearches.length === 0) {
-            sCont.innerHTML = `<div class="card" style="text-align: center; color: var(--secondary); font-size: 14px; border: 2px dashed var(--border);">У вас пока нет активных засад</div>`;
-        } else {
-            userSearches.forEach(s => {
-                let priceText = "Любая цена";
-                let minP = s.min_price && s.min_price > 0 ? s.min_price : null;
-                let maxP = s.max_price && s.max_price > 0 ? s.max_price : null;
-                
-                if (minP && maxP) priceText = `${minP}€ - ${maxP}€`;
-                else if (minP) priceText = `от ${minP}€`;
-                else if (maxP) priceText = `до ${maxP}€`;
-                
-                // ЗДЕСЬ ИСПРАВЛЕН ВЫВОД ФЛАГОВ ДЛЯ МУЛЬТИ-СТРАН
-                const domainArray = (s.domain || 'vinted.fr').split(',');
-                const flag = domainArray.map(d => flags[d.trim()] || '🌐').join(' ');
-                
-                sCont.innerHTML += `
-                    <div class="search-item">
-                        <div>
-                            <div style="font-size: 17px; font-weight: 800; margin-bottom: 4px;">${flag} ${s.brand || 'Любой бренд'}</div>
-                            <div style="color: var(--green); font-size: 14px; font-weight: 700;">💰 ${priceText}</div>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="edit-btn" onclick="startEdit(${s.id})">✏️</button>
-                            <button class="delete-btn" onclick="deleteSearch(${s.id})">🗑</button>
-                        </div>
-                    </div>`;
-            });
-        }
+  <div class="section-title" style="margin-top:16px">🔍 Поиск на Mercari</div>
 
-        // Переключение вкладок
-        function switchTab(tabId) {
-            document.querySelectorAll('.content, .tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-            document.querySelector('.bottom-bar').style.display = tabId === 'search' ? 'block' : 'none';
-            try { tg.HapticFeedback.impactOccurred('light'); } catch(e){}
-        }
+  <div class="search-bar">
+    <input id="searchInput" placeholder="Stone Island, ナイキ, iPhone..." 
+           onkeydown="if(event.key==='Enter')doSearch()">
+    <button onclick="doSearch()">🔍</button>
+  </div>
 
-        // Обычные переключатели (категории, тарифы)
-        function selectSegment(groupId, el) {
-            document.querySelectorAll(`#${groupId}-selector .segment-btn`).forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            try { tg.HapticFeedback.selectionChanged(); } catch(e){}
-        }
+  <!-- Quick search brands -->
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px" id="quickSearch"></div>
 
-        // ЗДЕСЬ ДОБАВЛЕНА НОВАЯ ФУНКЦИЯ ДЛЯ МУЛЬТИ-ВЫБОРА СТРАН
-        function toggleDomain(el) {
-            const activeDomains = document.querySelectorAll('#domain-selector .active');
-            // Не даем снять выделение с последней активной страны
-            if (el.classList.contains('active') && activeDomains.length === 1) {
-                try { tg.HapticFeedback.notificationOccurred('warning'); } catch(e){}
-                return;
-            }
-            el.classList.toggle('active');
-            try { tg.HapticFeedback.selectionChanged(); } catch(e){}
-        }
+  <div id="searchResults"></div>
 
-        function selectPlan(el) {
-            document.querySelectorAll('#plan-selector .segment-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            try { tg.HapticFeedback.selectionChanged(); } catch(e){}
-        }
+</div>
 
-        function toggleChip(el) {
-            el.classList.toggle('selected');
-            try { tg.HapticFeedback.selectionChanged(); } catch(e){}
-        }
+<!-- ═══════════ PAGE: SUBSCRIPTION ═══════════ -->
+<div class="page" id="page-sub">
 
-        // Редактирование
-        function startEdit(id) {
-            const s = userSearches.find(x => x.id === id);
-            if (!s) return;
-            
-            currentEditId = id;
-            try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
-            
-            document.getElementById('brand').value = s.brand || '';
-            document.getElementById('min_price').value = (s.min_price && s.min_price > 0) ? s.min_price : '';
-            document.getElementById('max_price').value = (s.max_price && s.max_price > 0) ? s.max_price : '';
-            document.getElementById('size').value = s.size || '';
-            document.getElementById('minus_words').value = s.minus_words || '';
-            
-            // ЗДЕСЬ ИСПРАВЛЕНО ДЛЯ МУЛЬТИ-СТРАН
-            const savedDomains = (s.domain || 'vinted.fr').split(',').map(d => d.trim());
-            document.querySelectorAll('#domain-selector .segment-btn').forEach(b => {
-                if (savedDomains.includes(b.getAttribute('data-val'))) {
-                    b.classList.add('active');
-                } else {
-                    b.classList.remove('active');
-                }
-            });
+  <div class="hero" style="padding:24px 0 16px">
+    <div style="font-size:36px;margin-bottom:8px">⭐</div>
+    <div class="hero-title" style="font-size:24px">PREMIUM</div>
+    <div class="hero-sub">Будь быстрее. Лови больше.</div>
+  </div>
 
-            document.querySelectorAll('#category-selector .segment-btn').forEach(b => {
-                b.classList.remove('active');
-                if (b.getAttribute('data-val') === s.category) b.classList.add('active');
-            });
-            
-            document.querySelectorAll('#conditions-container .chip').forEach(c => c.classList.remove('selected'));
-            if (s.conditions) {
-                try {
-                    const conds = JSON.parse(s.conditions);
-                    document.querySelectorAll('#conditions-container .chip').forEach(c => {
-                        if (conds.includes(parseInt(c.getAttribute('data-val')))) c.classList.add('selected');
-                    });
-                } catch(e) {}
-            }
-            
-            const btn = document.getElementById('submit-btn');
-            btn.innerText = "💾 Сохранить изменения";
-            btn.style.background = "linear-gradient(135deg, #34c759, #28a745)";
-            
-            switchTab('search');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+  <div class="stats-row">
+    <div class="stat-box">
+      <span class="stat-val">50</span>
+      <span class="stat-label">Фильтров</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-val">8с</span>
+      <span class="stat-label">Интервал</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-val">24/7</span>
+      <span class="stat-label">Мониторинг</span>
+    </div>
+  </div>
 
-        // Флаг защиты от двойного нажатия (ЗДЕСЬ ИСПРАВЛЕНО ДВОЙНОЕ СОЗДАНИЕ)
-        let isSubmitting = false;
+  <div class="section-title">Выбери план</div>
 
-        function sendSearch() {
-            if (isSubmitting) return; // Блокируем, если уже нажато
-            
-            if (premiumDays <= 0) { tg.showAlert("Купите Premium для использования Снайпера!"); return; }
-            
-            const brand = document.getElementById('brand').value.trim();
-            const min_price = document.getElementById('min_price').value;
-            const max_price = document.getElementById('max_price').value;
-            
-            if (!brand && !max_price) { tg.showAlert("Введите Бренд или Макс. Цену!"); return; }
+  <div id="plansList"></div>
 
-            // Блокируем кнопку визульно и логически
-            isSubmitting = true;
-            const btn = document.getElementById('submit-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ Отправка...";
-            btn.style.opacity = "0.7";
+  <div class="card" style="margin-top:16px">
+    <div class="section-title" style="margin-top:0">Способы оплаты</div>
+    <div style="font-size:13px;color:var(--hint);line-height:1.6">
+      ⭐ <b style="color:var(--text)">Telegram Stars</b> — моментальная активация<br>
+      ₿ <b style="color:var(--text)">Крипто</b> (USDT) — через @CryptoBot<br>
+      💳 <b style="color:var(--text)">Карта</b> — напиши <a href="https://t.me/liknine" 
+         style="color:var(--gold);text-decoration:none">@liknine</a>
+    </div>
+  </div>
 
-            const conditions = Array.from(document.querySelectorAll('#conditions-container .chip.selected')).map(el => parseInt(el.getAttribute('data-val')));
-            
-            // ЗДЕСЬ СОБИРАЕТСЯ МАССИВ СТРАН
-            const selectedDomains = Array.from(document.querySelectorAll('#domain-selector .active')).map(el => el.getAttribute('data-val'));
-            
-            const data = {
-                action: currentEditId ? "edit" : "add",
-                search_id: currentEditId,
-                domain: selectedDomains, // Массив стран летит в питон
-                category: document.querySelector('#category-selector .active').getAttribute('data-val'),
-                brand: brand,
-                size: document.getElementById('size').value.trim(),
-                min_price: min_price,
-                max_price: max_price,
-                minus_words: document.getElementById('minus_words').value.trim(),
-                conditions: conditions 
-            };
-            
-            try { tg.HapticFeedback.notificationOccurred('success'); } catch(e){}
-            tg.sendData(JSON.stringify(data)); 
+</div>
 
-            // На случай если WebApp не закрылся сразу, разблокируем кнопку через 2 секунды
-            setTimeout(() => {
-                isSubmitting = false;
-                btn.innerText = originalText;
-                btn.style.opacity = "1";
-            }, 2000);
-        }
+<!-- ═══════════ PAGE: SETTINGS ═══════════ -->
+<div class="page" id="page-settings">
 
-        function deleteSearch(searchId) {
-            try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
-            tg.showConfirm("Снять эту засаду?", function(isConfirmed) {
-                if(isConfirmed) tg.sendData(JSON.stringify({ action: "delete", search_id: searchId }));
-            });
-        }
+  <div class="section-title" style="margin-top:16px">⚙️ Настройки</div>
 
-        function buyMethod(method) {
-            try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
-            const plan = document.querySelector('#plan-selector .active').getAttribute('data-val');
-            tg.sendData(JSON.stringify({ action: method, plan: plan }));
-        }
+  <div class="card">
+    <div class="card-title">👤 Профиль</div>
+    <div style="margin-top:10px">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--hint)">Имя</span>
+        <span id="settName">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="color:var(--hint)">ID</span>
+        <span id="settId">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0">
+        <span style="color:var(--hint)">Подписка</span>
+        <span id="settPlan" style="color:var(--gold)">—</span>
+      </div>
+    </div>
+  </div>
 
-        function contactAdmin() {
-            try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
-            tg.openTelegramLink('https://t.me/liknine?text=' + encodeURIComponent("Привет! Хочу купить подписку. Мой ID: " + userId));
-        }
-    </script>
+  <div class="card">
+    <div class="card-title">ℹ️ О боте</div>
+    <p style="margin-top:8px;font-size:13px;color:var(--hint);line-height:1.6">
+      Mercari Brand Sniper — бот для отслеживания брендовых вещей 
+      на Mercari Japan. Stone Island, Undercover, Number (N)ine, 
+      Margiela, Rick Owens и другие грейлы.
+    </p>
+    <p style="margin-top:8px;font-size:11px;color:var(--hint)">v2.0.0</p>
+  </div>
+
+</div>
+
+</div><!-- /container -->
+
+<!-- Bottom Navigation -->
+<nav class="nav">
+  <button class="nav-item active" onclick="showPage('home')" data-page="home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Главная</span>
+  </button>
+  <button class="nav-item" onclick="showPage('filters')" data-page="filters">
+    <span class="nav-icon">🎯</span>
+    <span class="nav-label">Фильтры</span>
+  </button>
+  <button class="nav-item" onclick="showPage('search')" data-page="search">
+    <span class="nav-icon">🔍</span>
+    <span class="nav-label">Поиск</span>
+  </button>
+  <button class="nav-item" onclick="showPage('sub')" data-page="sub">
+    <span class="nav-icon">⭐</span>
+    <span class="nav-label">Premium</span>
+  </button>
+  <button class="nav-item" onclick="showPage('settings')" data-page="settings">
+    <span class="nav-icon">⚙️</span>
+    <span class="nav-label">Ещё</span>
+  </button>
+</nav>
+
+
+<script>
+// ════════════════════════════════════════════════
+//  JS — Telegram Web App Logic
+// ════════════════════════════════════════════════
+
+const tg = window.Telegram?.WebApp;
+let userData = null;
+let userFilters = [];
+
+// ── Brands data (must match bot) ──
+const BRANDS = {
+  stone_island:  { name: "Stone Island",    emoji: "🧭", kw: "stone island"    },
+  undercover:    { name: "Undercover",      emoji: "🦇", kw: "undercover"      },
+  number_nine:   { name: "Number (N)ine",   emoji: "9️⃣", kw: "number nine"     },
+  margiela:      { name: "Maison Margiela", emoji: "🤍", kw: "マルジェラ"        },
+  raf_simons:    { name: "Raf Simons",      emoji: "🔴", kw: "raf simons"      },
+  rick_owens:    { name: "Rick Owens",      emoji: "🖤", kw: "rick owens"      },
+  kapital:       { name: "Kapital",         emoji: "🌀", kw: "kapital"         },
+  cdg:           { name: "CDG",             emoji: "❤️", kw: "コムデギャルソン"   },
+  issey_miyake:  { name: "Issey Miyake",    emoji: "🌊", kw: "issey miyake"    },
+  yohji:         { name: "Yohji Yamamoto",  emoji: "⚫", kw: "ヨウジヤマモト"    },
+  visvim:        { name: "Visvim",          emoji: "🪶", kw: "visvim"          },
+  bape:          { name: "BAPE",            emoji: "🦍", kw: "bape"            },
+  supreme:       { name: "Supreme",         emoji: "📕", kw: "supreme"         },
+  chrome_hearts: { name: "Chrome Hearts",   emoji: "✝️", kw: "クロムハーツ"      },
+  needles:       { name: "Needles",         emoji: "🦋", kw: "needles"         },
+  cav_empt:      { name: "Cav Empt",       emoji: "🔷", kw: "cav empt"        },
+};
+
+const PLANS = [
+  { key: "1month",  label: "1 месяц",  price: "$10",  stars: 500,  badge: "" },
+  { key: "3months", label: "3 месяца", price: "$25",  stars: 1250, badge: "−17%" },
+  { key: "1year",   label: "1 год",    price: "$90",  stars: 4500, badge: "−25%" },
+  { key: "forever", label: "Навсегда", price: "$130", stars: 6500, badge: "ЛУЧШАЯ ЦЕНА", best: true },
+];
+
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#0a0a0a');
+    tg.setBackgroundColor('#0a0a0a');
+  }
+
+  // Get user info from TG
+  if (tg?.initDataUnsafe?.user) {
+    userData = tg.initDataUnsafe.user;
+    document.getElementById('settName').textContent = userData.first_name || 'User';
+    document.getElementById('settId').textContent = userData.id;
+  }
+
+  renderBrands();
+  renderPlans();
+  renderQuickSearch();
+});
+
+
+// ── Navigation ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === name);
+  });
+
+  if (tg) {
+    if (name === 'home') tg.BackButton.hide();
+    else {
+      tg.BackButton.show();
+      tg.BackButton.onClick(() => showPage('home'));
+    }
+  }
+
+  // Haptic
+  try { tg?.HapticFeedback?.impactOccurred('light'); } catch(e){}
+}
+
+
+// ── Render Brands ──
+function renderBrands() {
+  const grid = document.getElementById('brandGrid');
+  grid.innerHTML = '';
+  
+  Object.entries(BRANDS).forEach(([key, brand]) => {
+    const card = document.createElement('div');
+    card.className = 'brand-card';
+    card.innerHTML = `
+      <span class="brand-emoji">${brand.emoji}</span>
+      <span class="brand-name">${brand.name}</span>
+    `;
+    card.onclick = () => quickBrand(key, brand);
+    grid.appendChild(card);
+  });
+}
+
+
+// ── Quick Brand → Create filter via bot ──
+function quickBrand(key, brand) {
+  try { tg?.HapticFeedback?.impactOccurred('medium'); } catch(e){}
+  
+  // Send data to bot
+  if (tg) {
+    tg.sendData(JSON.stringify({
+      action: 'quick_brand',
+      brand_key: key,
+    }));
+    toast(`${brand.emoji} ${brand.name} — фильтр создаётся...`);
+    setTimeout(() => tg.close(), 1500);
+  } else {
+    toast(`${brand.emoji} ${brand.name} selected`);
+  }
+}
+
+
+// ── Render Plans ──
+function renderPlans() {
+  const list = document.getElementById('plansList');
+  list.innerHTML = '';
+
+  PLANS.forEach(plan => {
+    const card = document.createElement('div');
+    card.className = 'plan-card' + (plan.best ? ' best' : '');
+    
+    const badgeHtml = plan.badge ? 
+      `<span class="plan-badge">${plan.badge}</span>` : '';
+
+    card.innerHTML = `
+      <div class="plan-header">
+        <span class="plan-name">${plan.label}${badgeHtml}</span>
+        <span class="plan-price">${plan.price}</span>
+      </div>
+      <div class="plan-perks">${plan.stars} ⭐ Stars • 50 фильтров • 8с интервал</div>
+    `;
+    card.onclick = () => selectPlan(plan);
+    list.appendChild(card);
+  });
+}
+
+
+// ── Select Plan ──
+function selectPlan(plan) {
+  try { tg?.HapticFeedback?.impactOccurred('medium'); } catch(e){}
+  
+  if (tg) {
+    tg.sendData(JSON.stringify({
+      action: 'subscribe',
+      plan: plan.key,
+    }));
+    toast('Переход к оплате...');
+    setTimeout(() => tg.close(), 1000);
+  }
+}
+
+
+// ── Quick Search Tags ──
+function renderQuickSearch() {
+  const container = document.getElementById('quickSearch');
+  const popular = ['stone_island','undercover','number_nine','margiela','rick_owens','cdg'];
+  
+  popular.forEach(key => {
+    const brand = BRANDS[key];
+    if (!brand) return;
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.style.cursor = 'pointer';
+    tag.textContent = `${brand.emoji} ${brand.name}`;
+    tag.onclick = () => {
+      document.getElementById('searchInput').value = brand.kw;
+      doSearch();
+    };
+    container.appendChild(tag);
+  });
+}
+
+
+// ── Search ──
+async function doSearch() {
+  const kw = document.getElementById('searchInput').value.trim();
+  if (!kw) return;
+
+  try { tg?.HapticFeedback?.impactOccurred('light'); } catch(e){}
+
+  const results = document.getElementById('searchResults');
+  results.innerHTML = '<div class="loading"><div class="spinner"></div><p style="color:var(--hint);font-size:13px">Поиск на Mercari...</p></div>';
+
+  // In real app, this would call your API
+  // For demo, show placeholder
+  setTimeout(() => {
+    results.innerHTML = `
+      <div class="empty fade-in">
+        <span class="empty-icon">🔍</span>
+        <p>Поиск работает через бота</p>
+        <p style="font-size:12px;margin-top:8px">Создай фильтр и получай уведомления<br>о новых товарах в Telegram</p>
+        <button class="btn btn-outline btn-sm" style="margin-top:16px" 
+                onclick="sendSearch('${kw.replace(/'/g,"\\'")}')">
+          🎯 Создать фильтр «${kw.substring(0,20)}»
+        </button>
+      </div>
+    `;
+  }, 1500);
+}
+
+function sendSearch(kw) {
+  if (tg) {
+    tg.sendData(JSON.stringify({ action: 'create_filter', keyword: kw }));
+    toast('Создаю фильтр...');
+    setTimeout(() => tg.close(), 1000);
+  }
+}
+
+
+// ── New Filter Form ──
+function showNewFilter() {
+  document.getElementById('newFilterForm').style.display = 'block';
+  try { tg?.HapticFeedback?.impactOccurred('light'); } catch(e){}
+}
+
+function hideNewFilter() {
+  document.getElementById('newFilterForm').style.display = 'none';
+}
+
+function createFilter() {
+  const name    = document.getElementById('nfName').value.trim();
+  const keyword = document.getElementById('nfKeyword').value.trim();
+  const exclude = document.getElementById('nfExclude').value.trim();
+  const pMin    = document.getElementById('nfPMin').value || 0;
+  const pMax    = document.getElementById('nfPMax').value || 0;
+  const cat     = document.getElementById('nfCat').value;
+
+  if (!name || !keyword) {
+    toast('Заполни название и ключевое слово');
+    return;
+  }
+
+  try { tg?.HapticFeedback?.notificationOccurred('success'); } catch(e){}
+
+  if (tg) {
+    tg.sendData(JSON.stringify({
+      action: 'create_filter',
+      name, keyword, exclude,
+      price_min: parseInt(pMin) || 0,
+      price_max: parseInt(pMax) || 0,
+      category: cat,
+    }));
+    toast('✅ Фильтр создаётся...');
+    setTimeout(() => tg.close(), 1500);
+  } else {
+    toast('✅ Filter: ' + name);
+    hideNewFilter();
+  }
+}
+
+
+// ── Toast ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+
 </body>
 </html>
